@@ -10,7 +10,7 @@ xhr            = null
 fetchReplacement = (url) ->
   triggerEvent 'page:fetch'
 
-  restoreFromCacheForUrl(url)
+  restoreFromCacheForUrl url
 
   # Remove hash from url to ensure IE 10 compatibility
   safeUrl = removeHash url
@@ -67,8 +67,8 @@ constrainPageCacheTo = (limit) ->
   return
 
 restoreFromCacheForUrl = (url) ->
-  if cache = latestPageCacheFromUrl(url)
-    reflectNewUrl(url)
+  if cache = latestPageCacheFromUrl url
+    reflectNewUrl url
     changePage cache.title, cache.body
 
 latestPageCacheFromUrl = (url) ->
