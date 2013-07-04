@@ -67,13 +67,15 @@ constrainPageCacheTo = (limit) ->
   return
 
 restoreFromCacheForUrl = (url) ->
-  if cache = pageCacheFromUrl(url)
+  if cache = latestPageCacheFromUrl(url)
     reflectNewUrl(url)
     changePage cache.title, cache.body
 
-pageCacheFromUrl = (url) ->
-  for own key, value of pageCache
-    return value if value and value.url is url
+latestPageCacheFromUrl = (url) ->
+  pageCacheKeysLatestFirst = Object.keys(pageCache).sort (a, b) -> b - a
+
+  for key in pageCacheKeysLatestFirst
+    return pageCache[key] if pageCache[key] and pageCache[key].url is url
 
 changePage = (title, body, csrfToken, runScripts) ->
   document.title = title
