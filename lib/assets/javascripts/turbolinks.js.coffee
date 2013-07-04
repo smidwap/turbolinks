@@ -3,7 +3,6 @@ currentState   = null
 referer        = null
 loadedAssets   = null
 pageCache      = {}
-urlCache       = {}
 createDocument = null
 requestMethod  = document.cookie.match(/request_method=(\w+)/)?[1].toUpperCase() or ''
 xhr            = null
