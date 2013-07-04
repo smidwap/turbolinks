@@ -3,13 +3,15 @@ currentState   = null
 referer        = null
 loadedAssets   = null
 pageCache      = {}
+urlCache       = {}
 createDocument = null
 requestMethod  = document.cookie.match(/request_method=(\w+)/)?[1].toUpperCase() or ''
 xhr            = null
 
-
 fetchReplacement = (url) ->
   triggerEvent 'page:fetch'
+
+  restoreFromCacheForUrl(url)
 
   # Remove hash from url to ensure IE 10 compatibility
   safeUrl = removeHash url
@@ -64,6 +66,15 @@ constrainPageCacheTo = (limit) ->
   for own key, value of pageCache
     pageCache[key] = null if key <= currentState.position - limit
   return
+
+restoreFromCacheForUrl = (url) ->
+  if cache = pageCacheFromUrl(url)
+    reflectNewUrl(url)
+    changePage cache.title, cache.body
+
+pageCacheFromUrl = (url) ->
+  for own key, value of pageCache
+    return value if value and value.url is url
 
 changePage = (title, body, csrfToken, runScripts) ->
   document.title = title
