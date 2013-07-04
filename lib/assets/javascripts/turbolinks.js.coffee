@@ -10,7 +10,7 @@ xhr            = null
 fetchReplacement = (url) ->
   triggerEvent 'page:fetch'
 
-  restoreFromCacheForUrl url
+  restoredTemporarilyFromCache = restoreFromCacheForUrl url
 
   # Remove hash from url to ensure IE 10 compatibility
   safeUrl = removeHash url
@@ -25,7 +25,7 @@ fetchReplacement = (url) ->
     triggerEvent 'page:receive'
 
     if doc = processResponse()
-      reflectNewUrl url
+      reflectNewUrl url unless restoredTemporarilyFromCache
       changePage extractTitleAndBody(doc)...
       reflectRedirectedUrl()
       if document.location.hash
