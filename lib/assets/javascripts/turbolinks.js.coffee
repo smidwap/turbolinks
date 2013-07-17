@@ -31,7 +31,7 @@ fetchReplacement = (url) ->
       if document.location.hash
         document.location.href = document.location.href
       else
-        resetScrollPosition()
+        resetScrollPosition() unless restoredTemporarilyFromCache
       triggerEvent 'page:load'
     else
       document.location.href = url
