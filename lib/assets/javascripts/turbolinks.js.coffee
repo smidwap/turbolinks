@@ -7,10 +7,8 @@ createDocument = null
 requestMethod  = document.cookie.match(/request_method=(\w+)/)?[1].toUpperCase() or ''
 xhr            = null
 
-fetchReplacement = (url) ->
+fetchReplacement = (url, restoredFromPrefetchCache = false) ->
   triggerEvent 'page:fetch'
-
-  restoredTemporarilyFromCache = restoreFromCacheForUrl url
 
   # Remove hash from url to ensure IE 10 compatibility
   safeUrl = removeHash url
@@ -25,13 +23,13 @@ fetchReplacement = (url) ->
     triggerEvent 'page:receive'
 
     if doc = processResponse()
-      reflectNewUrl url unless restoredTemporarilyFromCache
+      reflectNewUrl url unless restoredFromPrefetchCache
       changePage extractTitleAndBody(doc)...
       reflectRedirectedUrl()
       if document.location.hash
         document.location.href = document.location.href
       else
-        resetScrollPosition() unless restoredTemporarilyFromCache
+        resetScrollPosition() unless restoredFromPrefetchCache
       triggerEvent 'page:load'
     else
       document.location.href = url
@@ -67,7 +65,7 @@ constrainPageCacheTo = (limit) ->
     pageCache[key] = null if key <= currentState.position - limit
   return
 
-restoreFromCacheForUrl = (url) ->
+restorePrefetchCache = (url) ->
   if cache = latestPageCacheFromUrl url
     reflectNewUrl url
     changePage cache.title, cache.body
@@ -287,7 +285,8 @@ if browserSupportsPushState and browserIsntBuggy and requestMethodIsSafe
   visit = (url) ->
     referer = document.location.href
     cacheCurrentPage()
-    fetchReplacement url
+    restoredFromPrefetchCache = restorePrefetchCache url
+    fetchReplacement url, restoredFromPrefetchCache
 
   initializeTurbolinks()
 else
