@@ -53,11 +53,12 @@ fetchHistory = (position) ->
 
 cacheCurrentPage = ->
   pageCache[currentState.position] =
-    url:       document.location.href,
-    body:      document.body,
-    title:     document.title,
-    positionY: window.pageYOffset,
-    positionX: window.pageXOffset
+    url:                    document.location.href,
+    body:                   document.body,
+    title:                  document.title,
+    positionY:              window.pageYOffset,
+    positionX:              window.pageXOffset,
+    prefetchCacheDisabled:  document.querySelector("[data-no-turbolinks-prefetch-cache]")?
 
   constrainPageCacheTo(CACHE_SIZE)
 
@@ -74,8 +75,11 @@ restoreFromCacheForUrl = (url) ->
 latestPageCacheFromUrl = (url) ->
   pageCacheKeysLatestFirst = Object.keys(pageCache).sort (a, b) -> b - a
 
+  isCacheForUrl = (cache, url) ->
+    cache and cache.url is url and !cache.prefetchCacheDisabled
+
   for key in pageCacheKeysLatestFirst
-    return pageCache[key] if pageCache[key] and pageCache[key].url is url
+    return pageCache[key] if isCacheForUrl(pageCache[key], url)
 
 changePage = (title, body, csrfToken, runScripts) ->
   document.title = title
